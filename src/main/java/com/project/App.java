@@ -1,13 +1,10 @@
 package com.project;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+import com.project.ui.AppUI;
+import javax.swing.SwingUtilities;
+
+public class App {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new AppUI());
     }
 }
