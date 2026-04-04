@@ -12,6 +12,7 @@ public class SchedulingService {
     private List<TimeSlot> slots = new ArrayList<>();
     private List<BookingRuleStrategy> rules = new ArrayList<>();
     private User currentUser;
+    private NotificationService notificationService;
 
     public SchedulingService() {
         users.add(new User("admin", "admin123", true));
@@ -21,6 +22,10 @@ public class SchedulingService {
             slots.add(new TimeSlot(LocalDateTime.now().plusDays(1).withHour(i).withMinute(0), 
                                   LocalDateTime.now().plusDays(1).withHour(i+1).withMinute(0)));
         }
+    }
+
+    public SchedulingService(NotificationService notificationService){
+        this.notificationService = notificationService;
     }
 
     public void addRule(BookingRuleStrategy rule) { rules.add(rule); }
@@ -71,5 +76,13 @@ public class SchedulingService {
         return appointments.stream()
                 .filter(a -> a.getUserId().equals(currentUser.getUsername()))
                 .collect(Collectors.toList());
+    }
+
+    public void CheckAndSendReminders(Appointment appointment, User user){
+        LocalDateTime now = LocalDateTime.now();
+
+        if(appointment.getStart().isBefore(now.plusHours(1))){
+            notificationService.sendReminder(appointment, user);
+        }
     }
 }

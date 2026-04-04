@@ -4,6 +4,7 @@ public class User {
     private String username;
     private String password;
     private boolean isAdmin;
+    private String email;
 
     public User(String username, String password, boolean isAdmin) {
         this.username = username;
@@ -21,5 +22,9 @@ public class User {
 
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public String getEmail(){
+        return email;
     }
 }
