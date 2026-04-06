@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 public class SchedulingService {
     private List<User> users = new ArrayList<>();
     private List<Appointment> appointments = new ArrayList<>();
@@ -27,6 +28,7 @@ public class SchedulingService {
     public SchedulingService(NotificationService notificationService){
         this.notificationService = notificationService;
     }
+
 
     public void addRule(BookingRuleStrategy rule) { rules.add(rule); }
 
@@ -78,11 +80,12 @@ public class SchedulingService {
                 .collect(Collectors.toList());
     }
 
-    public void CheckAndSendReminders(Appointment appointment, User user){
+    public void checkAndSendReminders(Appointment appointment, User user){
         LocalDateTime now = LocalDateTime.now();
 
         if(appointment.getStart().isBefore(now.plusHours(1))){
             notificationService.sendReminder(appointment, user);
         }
     }
+    
 }
