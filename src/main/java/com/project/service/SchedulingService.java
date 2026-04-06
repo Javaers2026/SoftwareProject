@@ -2,6 +2,12 @@ package com.project.service;
 
 import com.project.*;
 import com.project.strategy.BookingRuleStrategy;
+import com.project.strategy.DurationRule;
+import com.project.strategy.GroupRule;
+import com.project.strategy.IndividualRule;
+import com.project.strategy.ParticipantLimitRule;
+import com.project.strategy.UrgentRule;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +29,12 @@ public class SchedulingService {
             slots.add(new TimeSlot(LocalDateTime.now().plusDays(1).withHour(i).withMinute(0), 
                                   LocalDateTime.now().plusDays(1).withHour(i+1).withMinute(0)));
         }
+
+    rules.add(new DurationRule());
+    rules.add(new ParticipantLimitRule(5));
+    rules.add(new IndividualRule());
+    rules.add(new GroupRule());
+    rules.add(new UrgentRule());
     }
 
     public SchedulingService(NotificationService notificationService){
@@ -49,9 +61,9 @@ public class SchedulingService {
         return slots.stream().filter(TimeSlot::isAvailable).collect(Collectors.toList());
     }
 
-    public boolean book(TimeSlot slot, int participants) {
+    public boolean book(TimeSlot slot, int participants, AppointmentType type) {
         Appointment appt = new Appointment(UUID.randomUUID().toString(), currentUser.getUsername(), 
-                                           slot.getStart(), slot.getEnd(), participants);
+                                           slot.getStart(), slot.getEnd(), participants, type);
         for (BookingRuleStrategy rule : rules) {
             if (!rule.isValid(appt)) return false;
         }

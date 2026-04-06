@@ -10,13 +10,15 @@ public class Appointment {
     private LocalDateTime end;
     private int participants;
     private String status;
+    private AppointmentType type;
 
-    public Appointment(String id, String userId, LocalDateTime start, LocalDateTime end, int participants) {
+    public Appointment(String id, String userId, LocalDateTime start, LocalDateTime end, int participants, AppointmentType type) {
         this.id = id;
         this.userId = userId;
         this.start = start;
         this.end = end;
         this.participants = participants;
+        this.type = type;
         this.status = "Confirmed";
     }
 
@@ -27,6 +29,7 @@ public class Appointment {
     public int getParticipants() { return participants; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public AppointmentType getType(){ return type; }
 
     
 }

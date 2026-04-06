@@ -61,12 +61,15 @@ public class AppUI extends JFrame {
     }
 
     private void initDashboard() {
+        JComboBox<AppointmentType> typePicker = new JComboBox<>(AppointmentType.values());
         JPanel panel = new JPanel(new BorderLayout());
         
         appointmentModel = new DefaultTableModel(new Object[]{"ID", "User", "Start", "Status"}, 0);
         JTable table = new JTable(appointmentModel);
         
         JPanel actionPanel = new JPanel();
+        actionPanel.add(new JLabel("Type:"));
+        actionPanel.add(typePicker);
         slotPicker = new JComboBox<>();
         JButton bookBtn = new JButton("Book Slot");
         JButton cancelBtn = new JButton("Cancel Selected");
@@ -79,13 +82,19 @@ public class AppUI extends JFrame {
         actionPanel.add(logoutBtn);
 
         bookBtn.addActionListener(e -> {
-            int idx = slotPicker.getSelectedIndex();
-            if (idx != -1) {
-                TimeSlot slot = service.getAvailableSlots().get(idx);
-                if (service.book(slot, 1)) refreshData();
-                else JOptionPane.showMessageDialog(this, "Rule Violation");
-            }
-        });
+    int idx = slotPicker.getSelectedIndex();
+    if (idx != -1) {
+        TimeSlot slot = service.getAvailableSlots().get(idx);
+
+        AppointmentType selectedType =
+                (AppointmentType) typePicker.getSelectedItem();
+
+        if (service.book(slot, 1, selectedType))
+            refreshData();
+        else
+            JOptionPane.showMessageDialog(this, "Rule Violation");
+    }
+});
 
         cancelBtn.addActionListener(e -> {
             int row = table.getSelectedRow();
