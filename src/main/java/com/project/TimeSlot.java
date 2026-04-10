@@ -1,8 +1,11 @@
 package com.project;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TimeSlot {
+    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
+
     private LocalDateTime start;
     private LocalDateTime end;
     private boolean available;
@@ -31,6 +34,6 @@ public class TimeSlot {
 
     @Override
     public String toString() {
-        return start.getHour() + ":00 - " + end.getHour() + ":00";
+        return start.format(DISPLAY_FORMATTER) + " - " + end.format(DISPLAY_FORMATTER);
     }
 }

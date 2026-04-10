@@ -7,6 +7,7 @@ import com.project.strategy.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 
 public class AppUI extends JFrame {
@@ -20,6 +21,12 @@ public class AppUI extends JFrame {
         service = new SchedulingService();
         service.addRule(new DurationRule());
         service.addRule(new ParticipantLimitRule(3));
+
+        try {
+            service.loadAppointments("appointments.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         setTitle("Appointment System");
         setSize(600, 400);
@@ -82,26 +89,30 @@ public class AppUI extends JFrame {
         actionPanel.add(logoutBtn);
 
         bookBtn.addActionListener(e -> {
-    int idx = slotPicker.getSelectedIndex();
-    if (idx != -1) {
-        TimeSlot slot = service.getAvailableSlots().get(idx);
+            int idx = slotPicker.getSelectedIndex();
+            if (idx != -1) {
+                TimeSlot slot = service.getAvailableSlots().get(idx);
+                AppointmentType selectedType = (AppointmentType) typePicker.getSelectedItem();
 
-        AppointmentType selectedType =
-                (AppointmentType) typePicker.getSelectedItem();
-
-        if (service.book(slot, 1, selectedType))
-            refreshData();
-        else
-            JOptionPane.showMessageDialog(this, "Rule Violation");
-    }
-});
+                if (service.book(slot, 1, selectedType)) {
+                    saveAppointments();
+                    refreshData();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Rule Violation");
+                }
+            }
+        });
 
         cancelBtn.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
                 String id = (String) appointmentModel.getValueAt(row, 0);
-                if (service.cancel(id)) refreshData();
-                else JOptionPane.showMessageDialog(this, "Cannot Cancel");
+                if (service.cancel(id)) {
+                    saveAppointments();
+                    refreshData();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Cannot Cancel");
+                }
             }
         });
 
@@ -118,12 +129,20 @@ public class AppUI extends JFrame {
     private void refreshData() {
         appointmentModel.setRowCount(0);
         for (Appointment a : service.getAppointments()) {
-            appointmentModel.addRow(new Object[]{a.getId(), a.getUserId(), a.getStart(), a.getStatus()});
+            appointmentModel.addRow(new Object[]{a.getId(), a.getUserId(), a.getFormattedStart(), a.getStatus()});
         }
-        
+
         slotPicker.removeAllItems();
         for (TimeSlot s : service.getAvailableSlots()) {
-            slotPicker.addItem(s.getStart().toString());
+            slotPicker.addItem(s.toString());
+        }
+    }
+
+    private void saveAppointments() {
+        try {
+            service.saveAppointments("appointments.txt");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to save appointments: " + e.getMessage());
         }
     }
 
