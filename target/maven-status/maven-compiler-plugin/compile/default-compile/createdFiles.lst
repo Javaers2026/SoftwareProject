@@ -1,6 +1,0 @@
-com\project\User.class
-com\project\observer\Subject.class
-com\project\observer\NotifacationManager.class
-com\project\observer\Observer.class
-com\project\observer\EmailNotifacation.class
-com\project\TimeSlot.class
