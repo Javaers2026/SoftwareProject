@@ -322,4 +322,8 @@ public class SchedulingService {
         slot.setAvailable("Cancelled".equalsIgnoreCase(appointment.getStatus()));
         slots.add(slot);
     }
+    void clearSlotsForTesting() {
+    slots.clear();
+}
+
 }

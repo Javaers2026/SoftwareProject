@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class SchedulingServiceTest {
@@ -43,9 +44,13 @@ public class SchedulingServiceTest {
     void testDueReminderSchedulerSendsUserAndAdminNotification() {
         NotificationService notificationService = mock(NotificationService.class);
         SchedulingService schedulingService = new SchedulingService(notificationService);
+        schedulingService.clearSlotsForTesting();
 
         assertTrue(schedulingService.login("admin", "admin123"));
-        schedulingService.addTimeSlot(new TimeSlot(LocalDateTime.now().plusMinutes(10), LocalDateTime.now().plusMinutes(40)));
+        schedulingService.addTimeSlot(new TimeSlot(
+                LocalDateTime.now().plusMinutes(10),
+                LocalDateTime.now().plusMinutes(40)
+        ));
         schedulingService.logout();
 
         assertTrue(schedulingService.login("user", "user123"));
@@ -55,16 +60,26 @@ public class SchedulingServiceTest {
         Appointment appointment = schedulingService.getAppointments().get(0);
         schedulingService.checkAndSendRemindersForDueAppointments();
 
-        verify(notificationService, times(1)).sendReminder(eq(appointment), argThat(u -> !u.isAdmin() && u.getUsername().equals("user")));
-        verify(notificationService, times(1)).sendReminder(eq(appointment), argThat(User::isAdmin));
+        verify(notificationService, times(1)).sendReminder(
+                eq(appointment),
+                argThat(u -> !u.isAdmin() && u.getUsername().equals("user"))
+        );
+        verify(notificationService, times(1)).sendReminder(
+                eq(appointment),
+                argThat(User::isAdmin)
+        );
         assertTrue(appointment.isReminderSent());
     }
 
     @Test
     void testSaveAndLoadAppointments() throws Exception {
         SchedulingService service = new SchedulingService();
+        service.clearSlotsForTesting();
         assertTrue(service.login("user", "user123"));
-        TimeSlot slot = new TimeSlot(LocalDateTime.now().plusMinutes(10), LocalDateTime.now().plusMinutes(40));
+        TimeSlot slot = new TimeSlot(
+                LocalDateTime.now().plusMinutes(10).withSecond(0).withNano(0),
+                LocalDateTime.now().plusMinutes(40).withSecond(0).withNano(0)
+        );
         assertTrue(service.addTimeSlot(slot));
         assertTrue(service.book(slot, 1, AppointmentType.INDIVIDUAL));
 
@@ -85,8 +100,12 @@ public class SchedulingServiceTest {
     @Test
     void testSaveAndLoadSlots() throws Exception {
         SchedulingService service = new SchedulingService();
-        TimeSlot slot = new TimeSlot(LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0),
-                LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0).plusHours(1));
+        service.clearSlotsForTesting();
+
+        TimeSlot slot = new TimeSlot(
+                LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0),
+                LocalDateTime.now().plusDays(1).withHour(11).withMinute(0).withSecond(0).withNano(0)
+        );
         assertTrue(service.addTimeSlot(slot));
 
         Path tempFile = Files.createTempFile("slots", ".txt");
@@ -94,7 +113,9 @@ public class SchedulingServiceTest {
             service.saveSlots(tempFile.toString());
 
             SchedulingService loadedService = new SchedulingService();
+            loadedService.clearSlotsForTesting();
             loadedService.loadSlots(tempFile.toString());
+
             assertEquals(1, loadedService.getAvailableSlots().size());
             assertEquals(slot.getStart(), loadedService.getAvailableSlots().get(0).getStart());
             assertEquals(slot.getEnd(), loadedService.getAvailableSlots().get(0).getEnd());
