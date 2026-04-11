@@ -202,10 +202,41 @@ public class SchedulingService {
                 .collect(Collectors.toList());
     }
 
+    public List<User> getAdminUsers() {
+        return users.stream().filter(User::isAdmin).collect(Collectors.toList());
+    }
+
+    public User getUserByUsername(String username) {
+        return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
+    }
+
     public void checkAndSendReminders(Appointment appointment, User user) {
+        if (appointment == null || user == null) {
+            return;
+        }
         LocalDateTime now = LocalDateTime.now();
-        if (appointment.getStart().isBefore(now.plusHours(1))) {
+        if (!appointment.isReminderSent() && !"Cancelled".equalsIgnoreCase(appointment.getStatus())
+                && !appointment.getStart().isBefore(now)
+                && appointment.getStart().isBefore(now.plusHours(1))) {
             notificationService.sendReminder(appointment, user);
+            for (User admin : getAdminUsers()) {
+                notificationService.sendReminder(appointment, admin);
+            }
+            appointment.setReminderSent(true);
+        }
+    }
+
+    public void checkAndSendRemindersForDueAppointments() {
+        LocalDateTime now = LocalDateTime.now();
+        for (Appointment appointment : appointments) {
+            if (appointment == null || appointment.isReminderSent() || "Cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                continue;
+            }
+            if (!appointment.getStart().isBefore(now.plusHours(1)) || appointment.getStart().isBefore(now)) {
+                continue;
+            }
+            User appointmentUser = getUserByUsername(appointment.getUserId());
+            checkAndSendReminders(appointment, appointmentUser);
         }
     }
 

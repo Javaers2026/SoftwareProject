@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 public class SchedulingServiceTest {
@@ -35,6 +36,28 @@ public class SchedulingServiceTest {
         schedulingService.checkAndSendReminders(appointment, user);
 
         verify(notificationService, times(1)).sendReminder(appointment, user);
+        verify(notificationService, times(1)).sendReminder(eq(appointment), argThat(User::isAdmin));
+    }
+
+    @Test
+    void testDueReminderSchedulerSendsUserAndAdminNotification() {
+        NotificationService notificationService = mock(NotificationService.class);
+        SchedulingService schedulingService = new SchedulingService(notificationService);
+
+        assertTrue(schedulingService.login("admin", "admin123"));
+        schedulingService.addTimeSlot(new TimeSlot(LocalDateTime.now().plusMinutes(10), LocalDateTime.now().plusMinutes(40)));
+        schedulingService.logout();
+
+        assertTrue(schedulingService.login("user", "user123"));
+        TimeSlot slot = schedulingService.getAvailableSlots().get(0);
+        assertTrue(schedulingService.book(slot, 1, AppointmentType.INDIVIDUAL));
+
+        Appointment appointment = schedulingService.getAppointments().get(0);
+        schedulingService.checkAndSendRemindersForDueAppointments();
+
+        verify(notificationService, times(1)).sendReminder(eq(appointment), argThat(u -> !u.isAdmin() && u.getUsername().equals("user")));
+        verify(notificationService, times(1)).sendReminder(eq(appointment), argThat(User::isAdmin));
+        assertTrue(appointment.isReminderSent());
     }
 
     @Test

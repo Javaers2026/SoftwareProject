@@ -23,6 +23,7 @@ public class AppUI extends JFrame {
     private JButton cancelBtn;
     private JButton addTimelineBtn;
     private JLabel roleLabel;
+    private Timer reminderTimer;
 
     public AppUI() {
         service = new SchedulingService();
@@ -55,6 +56,7 @@ public class AppUI extends JFrame {
 
         add(cardPanel);
         setVisible(true);
+        startReminderTimer();
     }
 
     private void initLoginScreen() {
@@ -249,6 +251,18 @@ public class AppUI extends JFrame {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Invalid date/time format. Use dd/MM/yyyy HH:mm.");
             }
+        }
+    }
+
+    private void startReminderTimer() {
+        reminderTimer = new Timer(60_000, e -> service.checkAndSendRemindersForDueAppointments());
+        reminderTimer.setInitialDelay(0);
+        reminderTimer.start();
+    }
+
+    private void stopReminderTimer() {
+        if (reminderTimer != null) {
+            reminderTimer.stop();
         }
     }
 

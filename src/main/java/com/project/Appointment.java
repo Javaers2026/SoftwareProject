@@ -13,6 +13,7 @@ public class Appointment {
     private int participants;
     private String status;
     private AppointmentType type;
+    private boolean reminderSent;
 
     public Appointment(String id, String userId, LocalDateTime start, LocalDateTime end, int participants, AppointmentType type) {
         this.id = id;
@@ -22,11 +23,12 @@ public class Appointment {
         this.participants = participants;
         this.type = type;
         this.status = "Confirmed";
+        this.reminderSent = false;
     }
 
     public static Appointment fromFileString(String line) {
         String[] parts = line.split("\\|");
-        if (parts.length != 7) {
+        if (parts.length < 7 || parts.length > 8) {
             throw new IllegalArgumentException("Invalid appointment record: " + line);
         }
         Appointment appointment = new Appointment(
@@ -38,6 +40,9 @@ public class Appointment {
                 AppointmentType.valueOf(parts[6])
         );
         appointment.setStatus(parts[5]);
+        if (parts.length == 8) {
+            appointment.setReminderSent(Boolean.parseBoolean(parts[7]));
+        }
         return appointment;
     }
 
@@ -49,7 +54,8 @@ public class Appointment {
                 end.format(FILE_FORMATTER),
                 String.valueOf(participants),
                 status,
-                type.name()
+                type.name(),
+                String.valueOf(reminderSent)
         );
     }
 
@@ -63,4 +69,6 @@ public class Appointment {
     public AppointmentType getType() { return type; }
     public String getFormattedStart() { return start.format(FILE_FORMATTER); }
     public String getFormattedEnd() { return end.format(FILE_FORMATTER); }
+    public boolean isReminderSent() { return reminderSent; }
+    public void setReminderSent(boolean reminderSent) { this.reminderSent = reminderSent; }
 }
