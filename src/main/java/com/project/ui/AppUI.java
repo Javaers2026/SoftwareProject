@@ -270,6 +270,34 @@ public class AppUI extends JFrame {
         JComboBox<String> endHour = new JComboBox<>(hourOptions);
         JComboBox<String> endMinute = new JComboBox<>(minuteOptions);
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime defaultStart = now.withMinute(0).withSecond(0).withNano(0).plusHours(1);
+        LocalDateTime defaultEnd = defaultStart.plusHours(1);
+
+        String defaultStartDay = String.format("%02d", defaultStart.getDayOfMonth());
+        String defaultStartMonth = String.format("%02d", defaultStart.getMonthValue());
+        String defaultStartYear = String.valueOf(defaultStart.getYear());
+        String defaultStartHour = String.format("%02d", defaultStart.getHour());
+        String defaultStartMinute = String.format("%02d", defaultStart.getMinute());
+
+        String defaultEndDay = String.format("%02d", defaultEnd.getDayOfMonth());
+        String defaultEndMonth = String.format("%02d", defaultEnd.getMonthValue());
+        String defaultEndYear = String.valueOf(defaultEnd.getYear());
+        String defaultEndHour = String.format("%02d", defaultEnd.getHour());
+        String defaultEndMinute = String.format("%02d", defaultEnd.getMinute());
+
+        startDay.setSelectedItem(defaultStartDay);
+        startMonth.setSelectedItem(defaultStartMonth);
+        startYear.setSelectedItem(defaultStartYear);
+        startHour.setSelectedItem(defaultStartHour);
+        startMinute.setSelectedItem(defaultStartMinute);
+
+        endDay.setSelectedItem(defaultEndDay);
+        endMonth.setSelectedItem(defaultEndMonth);
+        endYear.setSelectedItem(defaultEndYear);
+        endHour.setSelectedItem(defaultEndHour);
+        endMinute.setSelectedItem(defaultEndMinute);
+
         JPanel startPanel = new JPanel(new GridLayout(2, 5, 5, 5));
         startPanel.add(new JLabel("Day"));
         startPanel.add(new JLabel("Month"));
