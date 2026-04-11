@@ -2,12 +2,16 @@ package com.project.service;
 
 import com.project.*;
 import com.project.observer.NotifacationManager;
+import com.project.strategy.AssessmentRule;
 import com.project.strategy.BookingRuleStrategy;
 import com.project.strategy.DurationRule;
+import com.project.strategy.FollowUpRule;
 import com.project.strategy.GroupRule;
 import com.project.strategy.IndividualRule;
+import com.project.strategy.InPersonRule;
 import com.project.strategy.ParticipantLimitRule;
 import com.project.strategy.UrgentRule;
+import com.project.strategy.VirtualRule;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,6 +60,10 @@ public class SchedulingService {
         rules.add(new IndividualRule());
         rules.add(new GroupRule());
         rules.add(new UrgentRule());
+        rules.add(new FollowUpRule());
+        rules.add(new AssessmentRule());
+        rules.add(new VirtualRule());
+        rules.add(new InPersonRule());
     }
 
     public void addRule(BookingRuleStrategy rule) {
