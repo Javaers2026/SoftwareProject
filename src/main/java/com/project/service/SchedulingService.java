@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 public class SchedulingService {
     private static final DateTimeFormatter FILE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final String USER_FILE = "users.txt";
 
     private List<User> users = new ArrayList<>();
     private List<Appointment> appointments = new ArrayList<>();
@@ -45,6 +46,11 @@ public class SchedulingService {
 
         users.add(new User("admin", "admin123", true));
         users.add(new User("user", "user123", false));
+        try {
+            loadUsers(USER_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         LocalDateTime base = LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0);
         for (int i = 9; i < 17; i++) {
@@ -78,6 +84,73 @@ public class SchedulingService {
 
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    public boolean registerUser(String username, String password) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            return false;
+        }
+        for (User u : users) {
+            if (u.getUsername().equalsIgnoreCase(username)) {
+                return false;
+            }
+        }
+        users.add(new User(username, password, false));
+        try {
+            saveUsers(USER_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public void saveUsers(String filename) throws IOException {
+        Path path = Paths.get(filename);
+        List<String> lines = new ArrayList<>();
+        for (User user : users) {
+            lines.add(String.join("|", user.getUsername(), user.getPassword(), String.valueOf(user.isAdmin())));
+        }
+        Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    public void loadUsers(String filename) throws IOException {
+        Path path = Paths.get(filename);
+        if (!Files.exists(path)) {
+            return;
+        }
+
+        Map<String, User> userMap = new LinkedHashMap<>();
+        userMap.put("admin", new User("admin", "admin123", true));
+        userMap.put("user", new User("user", "user123", false));
+
+        List<String> lines = Files.readAllLines(path);
+        for (String line : lines) {
+            if (line.trim().isEmpty()) {
+                continue;
+            }
+            String[] parts = line.split("\\|");
+            if (parts.length != 3) {
+                continue;
+            }
+            userMap.put(parts[0], new User(parts[0], parts[1], Boolean.parseBoolean(parts[2])));
+        }
+        users = new ArrayList<>(userMap.values());
+    }
+
+    public boolean addTimeSlot(TimeSlot timeSlot) {
+        if (timeSlot == null || timeSlot.getStart() == null || timeSlot.getEnd() == null) {
+            return false;
+        }
+        if (!timeSlot.getStart().isBefore(timeSlot.getEnd())) {
+            return false;
+        }
+        for (TimeSlot existing : slots) {
+            if (existing.getStart().equals(timeSlot.getStart()) && existing.getEnd().equals(timeSlot.getEnd())) {
+                return false;
+            }
+        }
+        slots.add(timeSlot);
+        return true;
     }
 
     public List<TimeSlot> getAvailableSlots() {

@@ -1,0 +1,2 @@
+admin|admin123|true
+user|user123|false
