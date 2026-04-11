@@ -338,6 +338,10 @@ public class AppUI extends JFrame {
                         endHour.getSelectedItem(), endMinute.getSelectedItem());
                 LocalDateTime start = LocalDateTime.parse(startValue, formatter);
                 LocalDateTime end = LocalDateTime.parse(endValue, formatter);
+                if (!end.isAfter(start)) {
+                    JOptionPane.showMessageDialog(this, "End time must be after start time.");
+                    return;
+                }
                 if (service.addTimeSlot(new TimeSlot(start, end))) {
                     JOptionPane.showMessageDialog(this, "Timeline added successfully.");
                     refreshData();
