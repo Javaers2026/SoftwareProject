@@ -64,7 +64,8 @@ public class SchedulingServiceTest {
     void testSaveAndLoadAppointments() throws Exception {
         SchedulingService service = new SchedulingService();
         assertTrue(service.login("user", "user123"));
-        TimeSlot slot = service.getAvailableSlots().get(0);
+        TimeSlot slot = new TimeSlot(LocalDateTime.now().plusMinutes(10), LocalDateTime.now().plusMinutes(40));
+        assertTrue(service.addTimeSlot(slot));
         assertTrue(service.book(slot, 1, AppointmentType.INDIVIDUAL));
 
         Path tempFile = Files.createTempFile("appointments", ".txt");
@@ -76,6 +77,27 @@ public class SchedulingServiceTest {
             assertTrue(loadedService.login("user", "user123"));
             assertEquals(1, loadedService.getAppointments().size());
             assertEquals("user", loadedService.getAppointments().get(0).getUserId());
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
+    }
+
+    @Test
+    void testSaveAndLoadSlots() throws Exception {
+        SchedulingService service = new SchedulingService();
+        TimeSlot slot = new TimeSlot(LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0),
+                LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0).plusHours(1));
+        assertTrue(service.addTimeSlot(slot));
+
+        Path tempFile = Files.createTempFile("slots", ".txt");
+        try {
+            service.saveSlots(tempFile.toString());
+
+            SchedulingService loadedService = new SchedulingService();
+            loadedService.loadSlots(tempFile.toString());
+            assertEquals(1, loadedService.getAvailableSlots().size());
+            assertEquals(slot.getStart(), loadedService.getAvailableSlots().get(0).getStart());
+            assertEquals(slot.getEnd(), loadedService.getAvailableSlots().get(0).getEnd());
         } finally {
             Files.deleteIfExists(tempFile);
         }

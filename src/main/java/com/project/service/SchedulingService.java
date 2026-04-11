@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class SchedulingService {
     private static final DateTimeFormatter FILE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final String USER_FILE = "users.txt";
+    private static final String SLOT_FILE = "slots.txt";
 
     private List<User> users = new ArrayList<>();
     private List<Appointment> appointments = new ArrayList<>();
@@ -56,9 +57,10 @@ public class SchedulingService {
             e.printStackTrace();
         }
 
-        LocalDateTime base = LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0);
-        for (int i = 9; i < 17; i++) {
-            slots.add(new TimeSlot(base.withHour(i), base.withHour(i + 1)));
+        try {
+            loadSlots(SLOT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         rules.add(new DurationRule());
@@ -145,6 +147,40 @@ public class SchedulingService {
         users = new ArrayList<>(userMap.values());
     }
 
+    public void saveSlots(String filename) throws IOException {
+        Path path = Paths.get(filename);
+        List<String> lines = new ArrayList<>();
+        for (TimeSlot slot : slots) {
+            lines.add(String.join("|", slot.getStart().format(FILE_FORMATTER), slot.getEnd().format(FILE_FORMATTER), String.valueOf(slot.isAvailable())));
+        }
+        Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    public void loadSlots(String filename) throws IOException {
+        Path path = Paths.get(filename);
+        if (!Files.exists(path)) {
+            return;
+        }
+
+        slots.clear();
+        List<String> lines = Files.readAllLines(path);
+        for (String line : lines) {
+            if (line.trim().isEmpty()) {
+                continue;
+            }
+            String[] parts = line.split("\\|");
+            if (parts.length != 3) {
+                continue;
+            }
+            TimeSlot slot = new TimeSlot(
+                    LocalDateTime.parse(parts[0], FILE_FORMATTER),
+                    LocalDateTime.parse(parts[1], FILE_FORMATTER)
+            );
+            slot.setAvailable(Boolean.parseBoolean(parts[2]));
+            slots.add(slot);
+        }
+    }
+
     public boolean addTimeSlot(TimeSlot timeSlot) {
         if (timeSlot == null || timeSlot.getStart() == null || timeSlot.getEnd() == null) {
             return false;
@@ -158,6 +194,11 @@ public class SchedulingService {
             }
         }
         slots.add(timeSlot);
+        try {
+            saveSlots(SLOT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 

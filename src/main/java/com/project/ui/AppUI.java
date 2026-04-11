@@ -201,9 +201,18 @@ public class AppUI extends JFrame {
         }
     }
 
+    private void saveSlots() {
+        try {
+            service.saveSlots("slots.txt");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to save slots: " + e.getMessage());
+        }
+    }
+
     private void saveAllData() {
         saveAppointments();
         saveUsers();
+        saveSlots();
     }
 
     private void showRegistrationDialog() {
@@ -230,18 +239,77 @@ public class AppUI extends JFrame {
     }
 
     private void showAddTimelineDialog() {
-        JTextField startField = new JTextField();
-        JTextField endField = new JTextField();
+        String[] dayOptions = new String[31];
+        String[] monthOptions = new String[12];
+        String[] yearOptions = new String[2];
+        String[] hourOptions = new String[24];
+        String[] minuteOptions = new String[]{"00", "15", "30", "45"};
+
+        for (int i = 0; i < 31; i++) {
+            dayOptions[i] = String.format("%02d", i + 1);
+        }
+        for (int i = 0; i < 12; i++) {
+            monthOptions[i] = String.format("%02d", i + 1);
+        }
+        int currentYear = LocalDateTime.now().getYear();
+        yearOptions[0] = String.valueOf(currentYear);
+        yearOptions[1] = String.valueOf(currentYear + 1);
+        for (int i = 0; i < 24; i++) {
+            hourOptions[i] = String.format("%02d", i);
+        }
+
+        JComboBox<String> startDay = new JComboBox<>(dayOptions);
+        JComboBox<String> startMonth = new JComboBox<>(monthOptions);
+        JComboBox<String> startYear = new JComboBox<>(yearOptions);
+        JComboBox<String> startHour = new JComboBox<>(hourOptions);
+        JComboBox<String> startMinute = new JComboBox<>(minuteOptions);
+
+        JComboBox<String> endDay = new JComboBox<>(dayOptions);
+        JComboBox<String> endMonth = new JComboBox<>(monthOptions);
+        JComboBox<String> endYear = new JComboBox<>(yearOptions);
+        JComboBox<String> endHour = new JComboBox<>(hourOptions);
+        JComboBox<String> endMinute = new JComboBox<>(minuteOptions);
+
+        JPanel startPanel = new JPanel(new GridLayout(2, 5, 5, 5));
+        startPanel.add(new JLabel("Day"));
+        startPanel.add(new JLabel("Month"));
+        startPanel.add(new JLabel("Year"));
+        startPanel.add(new JLabel("Hour"));
+        startPanel.add(new JLabel("Minute"));
+        startPanel.add(startDay);
+        startPanel.add(startMonth);
+        startPanel.add(startYear);
+        startPanel.add(startHour);
+        startPanel.add(startMinute);
+
+        JPanel endPanel = new JPanel(new GridLayout(2, 5, 5, 5));
+        endPanel.add(new JLabel("Day"));
+        endPanel.add(new JLabel("Month"));
+        endPanel.add(new JLabel("Year"));
+        endPanel.add(new JLabel("Hour"));
+        endPanel.add(new JLabel("Minute"));
+        endPanel.add(endDay);
+        endPanel.add(endMonth);
+        endPanel.add(endYear);
+        endPanel.add(endHour);
+        endPanel.add(endMinute);
+
         Object[] fields = {
-                "Start (dd/MM/yyyy HH:mm):", startField,
-                "End   (dd/MM/yyyy HH:mm):", endField
+                "Start (dd/MM/yyyy HH:mm):", startPanel,
+                "End   (dd/MM/yyyy HH:mm):", endPanel
         };
         int option = JOptionPane.showConfirmDialog(this, fields, "Add New Timeline", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (option == JOptionPane.OK_OPTION) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             try {
-                LocalDateTime start = LocalDateTime.parse(startField.getText().trim(), formatter);
-                LocalDateTime end = LocalDateTime.parse(endField.getText().trim(), formatter);
+                String startValue = String.format("%s/%s/%s %s:%s",
+                        startDay.getSelectedItem(), startMonth.getSelectedItem(), startYear.getSelectedItem(),
+                        startHour.getSelectedItem(), startMinute.getSelectedItem());
+                String endValue = String.format("%s/%s/%s %s:%s",
+                        endDay.getSelectedItem(), endMonth.getSelectedItem(), endYear.getSelectedItem(),
+                        endHour.getSelectedItem(), endMinute.getSelectedItem());
+                LocalDateTime start = LocalDateTime.parse(startValue, formatter);
+                LocalDateTime end = LocalDateTime.parse(endValue, formatter);
                 if (service.addTimeSlot(new TimeSlot(start, end))) {
                     JOptionPane.showMessageDialog(this, "Timeline added successfully.");
                     refreshData();
@@ -249,7 +317,7 @@ public class AppUI extends JFrame {
                     JOptionPane.showMessageDialog(this, "Unable to add timeline. It may already exist or use invalid times.");
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid date/time format. Use dd/MM/yyyy HH:mm.");
+                JOptionPane.showMessageDialog(this, "Invalid date/time selection. Use the dropdowns in dd/MM/yyyy HH:mm format.");
             }
         }
     }
