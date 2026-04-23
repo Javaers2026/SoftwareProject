@@ -2,10 +2,10 @@ package com.project.observer;
 
 import com.project.User;
 
-public class NotifacationManager extends Subject{
+public class NotificationManager extends Subject{
 
-    public NotifacationManager() {
-        addObserver(new EmailNotifacation());
+    public NotificationManager() {
+        addObserver(new EmailNotification());
         addObserver(new SystemNotification());
     }
     

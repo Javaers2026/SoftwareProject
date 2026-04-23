@@ -2,18 +2,17 @@ package com.project.service;
 
 import com.project.Appointment;
 import com.project.User;
-import com.project.observer.NotifacationManager;
+import com.project.observer.NotificationManager;
 
 public class NotificationService {
-    private NotifacationManager notifacationManager;
+    private NotificationManager notificationManager;
 
-    public NotificationService(NotifacationManager notifacationManager) {
-        this.notifacationManager = notifacationManager;
+    public NotificationService(NotificationManager notificationManager) {
+        this.notificationManager = notificationManager;
     }
 
     public void sendReminder(Appointment appointment, User user) {
         String message = "Reminder: You have an appointment at " + appointment.getFormattedStart();
-        notifacationManager.notifyAll(user, message);
+        notificationManager.notifyAll(user, message);
     }
 }
-

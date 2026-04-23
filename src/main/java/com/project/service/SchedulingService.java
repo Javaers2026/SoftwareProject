@@ -1,7 +1,7 @@
 package com.project.service;
 
 import com.project.*;
-import com.project.observer.NotifacationManager;
+import com.project.observer.NotificationManager;
 import com.project.strategy.AssessmentRule;
 import com.project.strategy.BookingRuleStrategy;
 import com.project.strategy.DurationRule;
@@ -69,7 +69,7 @@ public class SchedulingService {
 
     /**
      * Constructs a {@code SchedulingService} with the given notification service.
-     * If {@code null} is passed, a default service backed by {@link NotifacationManager} is created.
+     * If {@code null} is passed, a default service backed by {@link NotificationManager} is created.
      *
      * @param notificationService the notification service to use, or {@code null} for the default
      */
@@ -84,7 +84,7 @@ public class SchedulingService {
      */
     private void initialize() {
         if (notificationService == null) {
-            notificationService = new NotificationService(new NotifacationManager());
+            notificationService = new NotificationService(new NotificationManager());
         }
 
         users.add(new User("admin", "admin123", true));

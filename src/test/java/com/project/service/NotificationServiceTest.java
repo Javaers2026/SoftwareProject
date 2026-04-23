@@ -3,7 +3,7 @@ package com.project.service;
 import com.project.Appointment;
 import com.project.AppointmentType;
 import com.project.User;
-import com.project.observer.NotifacationManager;
+import com.project.observer.NotificationManager;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public class NotificationServiceTest {
 
     @Test
     void testNotificationManagerReceivesReminder() {
-        NotifacationManager manager = mock(NotifacationManager.class);
+        NotificationManager manager = mock(NotificationManager.class);
         NotificationService notificationService = new NotificationService(manager);
         User user = new User("ayman", "123", false);
         Appointment appointment = new Appointment(

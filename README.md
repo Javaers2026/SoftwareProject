@@ -76,8 +76,8 @@ src/
 │   ├── User.java
 │   ├── AppointmentType.java      # enum for all appointment types
 │   ├── observer/                 # notification system (Observer pattern)
-│   │   ├── NotifacationManager.java
-│   │   ├── EmailNotifacation.java
+│   │   ├── NotificationManager.java
+│   │   ├── EmailNotification.java
 │   │   └── SystemNotification.java
 │   ├── strategy/                 # booking rules (Strategy pattern)
 │   │   ├── BookingRuleStrategy.java
@@ -102,7 +102,7 @@ src/
 ## Design patterns used
 
 - **Strategy** — each appointment type's booking rules are their own class implementing a shared `BookingRuleStrategy` interface. Adding a new rule means adding a new class, nothing else changes.
-- **Observer** — when a reminder fires, the `NotifacationManager` notifies all registered observers (currently email and system tray). Easy to add more channels.
+- **Observer** — when a reminder fires, the `NotificationManager` notifies all registered observers (currently email and system tray). Easy to add more channels.
 
 ---
 

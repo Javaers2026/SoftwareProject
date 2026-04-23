@@ -8,7 +8,7 @@ public class ObserverTest {
 
     @Test
     void subject_addAndNotifyObserver() {
-        NotifacationManager manager = new NotifacationManager();
+        NotificationManager manager = new NotificationManager();
         Observer mockObserver = mock(Observer.class);
         manager.addObserver(mockObserver);
 
