@@ -10,7 +10,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class AppUI extends JFrame {
     private SchedulingService service;
@@ -93,7 +92,7 @@ public class AppUI extends JFrame {
         typePicker = new JComboBox<>(AppointmentType.values());
         JPanel panel = new JPanel(new BorderLayout());
 
-        appointmentModel = new DefaultTableModel(new Object[]{"ID", "User", "Start", "Type", "Status"}, 0) {
+        appointmentModel = new DefaultTableModel(new Object[] { "ID", "User", "Start", "Type", "Status" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -146,7 +145,8 @@ public class AppUI extends JFrame {
                     saveAppointments();
                     refreshData();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Cannot Cancel. You can only cancel your own appointments unless you are admin.");
+                    JOptionPane.showMessageDialog(this,
+                            "Cannot Cancel. You can only cancel your own appointments unless you are admin.");
                 }
             }
         });
@@ -167,7 +167,8 @@ public class AppUI extends JFrame {
     private void refreshData() {
         appointmentModel.setRowCount(0);
         for (Appointment a : service.getAppointments()) {
-            appointmentModel.addRow(new Object[]{a.getId(), a.getUserId(), a.getFormattedStart(), a.getType(), a.getStatus()});
+            appointmentModel.addRow(
+                    new Object[] { a.getId(), a.getUserId(), a.getFormattedStart(), a.getType(), a.getStatus() });
         }
 
         slotPicker.removeAllItems();
@@ -218,19 +219,23 @@ public class AppUI extends JFrame {
     private void showRegistrationDialog() {
         JTextField usernameField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
+        JTextField emailField = new JTextField();
         Object[] fields = {
                 "New Username:", usernameField,
-                "New Password:", passwordField
+                "New Password:", passwordField,
+                "Email Address:", emailField
         };
-        int option = JOptionPane.showConfirmDialog(this, fields, "Register New User", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int option = JOptionPane.showConfirmDialog(this, fields, "Register New User", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
         if (option == JOptionPane.OK_OPTION) {
             String username = usernameField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
-            if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Username and password cannot be empty.");
+            String email = emailField.getText().trim();
+            if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "All fields are required.");
                 return;
             }
-            if (service.registerUser(username, password)) {
+            if (service.registerUser(username, password, email)) {
                 JOptionPane.showMessageDialog(this, "User created successfully. You may now log in.");
             } else {
                 JOptionPane.showMessageDialog(this, "Unable to register user. Username may already exist.");
@@ -243,7 +248,7 @@ public class AppUI extends JFrame {
         String[] monthOptions = new String[12];
         String[] yearOptions = new String[2];
         String[] hourOptions = new String[24];
-        String[] minuteOptions = new String[]{"00", "15", "30", "45"};
+        String[] minuteOptions = new String[] { "00", "15", "30", "45" };
 
         for (int i = 0; i < 31; i++) {
             dayOptions[i] = String.format("%02d", i + 1);
@@ -326,7 +331,8 @@ public class AppUI extends JFrame {
                 "Start (dd/MM/yyyy HH:mm):", startPanel,
                 "End   (dd/MM/yyyy HH:mm):", endPanel
         };
-        int option = JOptionPane.showConfirmDialog(this, fields, "Add New Timeline", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int option = JOptionPane.showConfirmDialog(this, fields, "Add New Timeline", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
         if (option == JOptionPane.OK_OPTION) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             try {
@@ -346,10 +352,12 @@ public class AppUI extends JFrame {
                     JOptionPane.showMessageDialog(this, "Timeline added successfully.");
                     refreshData();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Unable to add timeline. It may already exist or use invalid times.");
+                    JOptionPane.showMessageDialog(this,
+                            "Unable to add timeline. It may already exist or use invalid times.");
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid date/time selection. Use the dropdowns in dd/MM/yyyy HH:mm format.");
+                JOptionPane.showMessageDialog(this,
+                        "Invalid date/time selection. Use the dropdowns in dd/MM/yyyy HH:mm format.");
             }
         }
     }

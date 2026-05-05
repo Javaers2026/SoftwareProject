@@ -12,7 +12,7 @@ public class ObserverTest {
         Observer mockObserver = mock(Observer.class);
         manager.addObserver(mockObserver);
 
-        User user = new User("alice", "pass", false);
+        User user = new User("alice", "pass", "alice@example.com", false);
         manager.notifyAll(user, "hello");
 
         verify(mockObserver, times(1)).notify(user, "hello");

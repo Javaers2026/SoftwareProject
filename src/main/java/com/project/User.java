@@ -3,11 +3,13 @@ package com.project;
 public class User {
     private String username;
     private String password;
+    private String email;
     private boolean isAdmin;
 
-    public User(String username, String password, boolean isAdmin) {
+    public User(String username, String password, String email, boolean isAdmin) {
         this.username = username;
         this.password = password;
+        this.email = email;
         this.isAdmin = isAdmin;
     }
 
@@ -19,8 +21,12 @@ public class User {
         return password;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public boolean isAdmin() {
         return isAdmin;
     }
 
-}
+}

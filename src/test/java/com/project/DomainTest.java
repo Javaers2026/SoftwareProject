@@ -125,15 +125,16 @@ public class DomainTest {
 
     @Test
     void user_getters_returnCorrectValues() {
-        User u = new User("alice", "secret", true);
+        User u = new User("alice", "secret", "alice@test.com", true);
         assertEquals("alice", u.getUsername());
         assertEquals("secret", u.getPassword());
+        assertEquals("alice@test.com", u.getEmail());
         assertTrue(u.isAdmin());
     }
 
     @Test
     void user_nonAdmin_isAdminFalse() {
-        User u = new User("bob", "pass", false);
+        User u = new User("bob", "pass", "bob@test.com", false);
         assertFalse(u.isAdmin());
     }
 

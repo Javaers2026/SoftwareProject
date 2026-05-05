@@ -87,8 +87,8 @@ public class SchedulingService {
             notificationService = new NotificationService(new NotificationManager());
         }
 
-        users.add(new User("admin", "admin123", true));
-        users.add(new User("user", "user123", false));
+        users.add(new User("admin", "admin123", "admin@system.com", true));
+        users.add(new User("user", "user123", "user@system.com", false));
         try {
             loadUsers(USER_FILE);
         } catch (IOException e) {
@@ -163,8 +163,8 @@ public class SchedulingService {
      * @return {@code true} if the user was created successfully; {@code false} if validation fails
      *         or the username already exists
      */
-    public boolean registerUser(String username, String password) {
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+    public boolean registerUser(String username, String password, String email) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty() || email == null || email.trim().isEmpty()) {
             return false;
         }
         for (User u : users) {
@@ -172,7 +172,7 @@ public class SchedulingService {
                 return false;
             }
         }
-        users.add(new User(username, password, false));
+        users.add(new User(username, password, email, false));
         try {
             saveUsers(USER_FILE);
         } catch (IOException e) {
@@ -191,7 +191,7 @@ public class SchedulingService {
         Path path = Paths.get(filename);
         List<String> lines = new ArrayList<>();
         for (User user : users) {
-            lines.add(String.join("|", user.getUsername(), user.getPassword(), String.valueOf(user.isAdmin())));
+            lines.add(String.join("|", user.getUsername(), user.getPassword(), user.getEmail(), String.valueOf(user.isAdmin())));
         }
         Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
@@ -210,8 +210,8 @@ public class SchedulingService {
         }
 
         Map<String, User> userMap = new LinkedHashMap<>();
-        userMap.put("admin", new User("admin", "admin123", true));
-        userMap.put("user", new User("user", "user123", false));
+        userMap.put("admin", new User("admin", "admin123", "admin@system.com", true));
+        userMap.put("user", new User("user", "user123", "user@system.com", false));
 
         List<String> lines = Files.readAllLines(path);
         for (String line : lines) {
@@ -219,10 +219,10 @@ public class SchedulingService {
                 continue;
             }
             String[] parts = line.split("\\|");
-            if (parts.length != 3) {
+            if (parts.length != 4) {
                 continue;
             }
-            userMap.put(parts[0], new User(parts[0], parts[1], Boolean.parseBoolean(parts[2])));
+            userMap.put(parts[0], new User(parts[0], parts[1], parts[2], Boolean.parseBoolean(parts[3])));
         }
         users = new ArrayList<>(userMap.values());
     }

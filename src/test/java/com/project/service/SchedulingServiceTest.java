@@ -75,23 +75,23 @@ public class SchedulingServiceTest {
     void registerUser_newUsername_returnsTrue() {
         // Use a unique name so a leftover users.txt from a prior run never causes a clash
         String unique = "testuser_" + System.nanoTime();
-        assertTrue(service.registerUser(unique, "pass123"));
+        assertTrue(service.registerUser(unique, "pass123", "test@example.com"));
         assertTrue(service.login(unique, "pass123"));
     }
 
     @Test
     void registerUser_duplicateUsername_returnsFalse() {
-        assertFalse(service.registerUser("admin", "anything"));
+        assertFalse(service.registerUser("admin", "anything", "admin@example.com"));
     }
 
     @Test
     void registerUser_emptyUsername_returnsFalse() {
-        assertFalse(service.registerUser("", "pass"));
+        assertFalse(service.registerUser("", "pass", "bad@example.com"));
     }
 
     @Test
     void registerUser_emptyPassword_returnsFalse() {
-        assertFalse(service.registerUser("someone", ""));
+        assertFalse(service.registerUser("someone", "", "bad@example.com"));
     }
 
     @Test
@@ -219,7 +219,7 @@ public class SchedulingServiceTest {
         String id = service.getAppointments().get(0).getId();
         service.logout();
 
-        service.registerUser("other", "pass");
+        service.registerUser("other", "pass", "other@example.com");
         service.login("other", "pass");
         assertFalse(service.cancel(id));
     }
@@ -261,7 +261,7 @@ public class SchedulingServiceTest {
     void testReminderSent() {
         NotificationService notificationService = mock(NotificationService.class);
         SchedulingService schedulingService = new SchedulingService(notificationService);
-        User user = new User("ayman", "123", false);
+        User user = new User("ayman", "123", "ayman@example.com", false);
 
         Appointment appointment = new Appointment(
                 "1",
@@ -313,7 +313,7 @@ public class SchedulingServiceTest {
     void reminder_notSentForCancelledAppointment() {
         NotificationService notificationService = mock(NotificationService.class);
         SchedulingService schedulingService = new SchedulingService(notificationService);
-        User user = new User("ayman", "123", false);
+        User user = new User("ayman", "123", "ayman@example.com", false);
 
         Appointment appointment = new Appointment(
                 "1", "ayman",
@@ -331,7 +331,7 @@ public class SchedulingServiceTest {
     void reminder_notSentIfAlreadySent() {
         NotificationService notificationService = mock(NotificationService.class);
         SchedulingService schedulingService = new SchedulingService(notificationService);
-        User user = new User("ayman", "123", false);
+        User user = new User("ayman", "123", "ayman@example.com", false);
 
         Appointment appointment = new Appointment(
                 "1", "ayman",
