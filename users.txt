@@ -1,4 +1,2 @@
-admin|admin123|true
-user|user123|false
-other|pass|false
-newuser|pass123|false
+admin|admin123|admin@system.com|true
+user|user123|user@system.com|false
