@@ -32,9 +32,9 @@ public class AppUI extends JFrame {
     private final Color BACKGROUND_COLOR = new Color(245, 247, 250);
     private final Color CARD_BACKGROUND = Color.WHITE;
     private final Color TEXT_COLOR = new Color(33, 37, 41);
-    private final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 24);
-    private final Font SUBHEADER_FONT = new Font("Segoe UI", Font.BOLD, 16);
-    private final Font MAIN_FONT = new Font("Segoe UI", Font.PLAIN, 14);
+    private final Font HEADER_FONT = new Font("SansSerif", Font.BOLD, 24);
+    private final Font SUBHEADER_FONT = new Font("SansSerif", Font.BOLD, 16);
+    private final Font MAIN_FONT = new Font("SansSerif", Font.PLAIN, 14);
 
     public AppUI() {
         service = new SchedulingService();
@@ -309,6 +309,9 @@ public class AppUI extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
         return btn;
     }
 
@@ -320,6 +323,8 @@ public class AppUI extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createLineBorder(new Color(207, 216, 220)));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(true);
         return btn;
     }
 
@@ -331,6 +336,9 @@ public class AppUI extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
         return btn;
     }
 
