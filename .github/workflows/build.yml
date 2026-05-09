@@ -31,7 +31,7 @@ jobs:
         run: mvn -B verify sonar:sonar -Pcoverage
         with:
           args: >
-            -Dsonar.projectKey=javaers2026_SoftwareProject
+            -Dsonar.projectKey=Javaers2026_SoftwareProject
             -Dsonar.organization=javaers2026
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

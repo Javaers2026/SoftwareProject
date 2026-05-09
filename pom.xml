@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
  
   <groupId>com.project</groupId>
-  <artifactId>demo</artifactId>
+  <artifactId>SoftwareProject</artifactId>
   <version>1.0</version>
  
-  <name>demo</name>
+  <name>SoftwareProject</name>
   <url>http://www.example.com</url>
  
   <properties>
@@ -19,6 +19,11 @@
     <sonar.projectKey>javaers2026_SoftwareProject</sonar.projectKey>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <argLine></argLine>
+    <sonar.exclusions>
+      src/main/java/com/project/ui/**,
+      src/main/java/com/project/generated/**
+    </sonar.exclusions>
   </properties>
  
   <dependencies>
@@ -127,6 +132,7 @@
                 <configuration>
                   <formats>
                     <format>XML</format>
+                    <format>HTML</format>
                   </formats>
                   <excludes>
                     <exclude>com/project/ui/**</exclude>
