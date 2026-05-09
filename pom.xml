@@ -56,31 +56,6 @@
         </configuration>
       </plugin>
  
-      <!-- JaCoCo: instrument tests and generate HTML/XML coverage report -->
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.11</version>
-        <executions>
-          <!-- Attach the JaCoCo agent before tests run -->
-          <execution>
-            <id>prepare-agent</id>
-            <goals><goal>prepare-agent</goal></goals>
-          </execution>
-          <!-- Generate the report after tests finish -->
-          <execution>
-    <id>report</id>
-    <phase>verify</phase>
-    <goals><goal>report</goal></goals>
-    <configuration>
-        <excludes>
-            <exclude>com/project/ui/**</exclude>
-        </excludes>
-    </configuration>
-</execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.sonarsource.scanner.maven</groupId>
         <artifactId>sonar-maven-plugin</artifactId>
@@ -125,4 +100,43 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.11</version>
+            <executions>
+              <!-- Attach the JaCoCo agent before tests run -->
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <!-- Generate XML report after tests finish -->
+              <execution>
+                <id>report</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <configuration>
+                  <formats>
+                    <format>XML</format>
+                  </formats>
+                  <excludes>
+                    <exclude>com/project/ui/**</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
