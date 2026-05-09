@@ -42,6 +42,14 @@ public class SchedulingService {
     /** Default filename for persisting available time slots. */
     private static final String SLOT_FILE = "slots.txt";
 
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_PASSWORD = "admin123";
+    private static final String ADMIN_EMAIL = "admin@system.com";
+
+    private static final String USER_USERNAME = "user";
+    private static final String USER_PASSWORD = "user123";
+    private static final String USER_EMAIL = "user@system.com";
+
     /** In-memory list of all registered users. */
     private List<User> users = new ArrayList<>();
 
@@ -61,7 +69,8 @@ public class SchedulingService {
     private NotificationService notificationService;
 
     /**
-     * Constructs a {@code SchedulingService} with a default {@link NotificationService}.
+     * Constructs a {@code SchedulingService} with a default
+     * {@link NotificationService}.
      */
     public SchedulingService() {
         this(null);
@@ -69,9 +78,11 @@ public class SchedulingService {
 
     /**
      * Constructs a {@code SchedulingService} with the given notification service.
-     * If {@code null} is passed, a default service backed by {@link NotificationManager} is created.
+     * If {@code null} is passed, a default service backed by
+     * {@link NotificationManager} is created.
      *
-     * @param notificationService the notification service to use, or {@code null} for the default
+     * @param notificationService the notification service to use, or {@code null}
+     *                            for the default
      */
     public SchedulingService(NotificationService notificationService) {
         this.notificationService = notificationService;
@@ -79,7 +90,8 @@ public class SchedulingService {
     }
 
     /**
-     * Initialises the service by seeding default users, loading persisted users and slots,
+     * Initialises the service by seeding default users, loading persisted users and
+     * slots,
      * and registering all booking rule strategies.
      */
     private void initialize() {
@@ -87,8 +99,8 @@ public class SchedulingService {
             notificationService = new NotificationService(new NotificationManager());
         }
 
-        users.add(new User("admin", "admin123", "admin@system.com", true));
-        users.add(new User("user", "user123", "user@system.com", false));
+        users.add(new User(ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, true));
+        users.add(new User(USER_USERNAME, USER_PASSWORD, USER_EMAIL, false));
         try {
             loadUsers(USER_FILE);
         } catch (IOException e) {
@@ -126,7 +138,8 @@ public class SchedulingService {
      *
      * @param username the username to authenticate
      * @param password the password to verify
-     * @return {@code true} if credentials match a registered user; {@code false} otherwise
+     * @return {@code true} if credentials match a registered user; {@code false}
+     *         otherwise
      */
     public boolean login(String username, String password) {
         for (User u : users) {
@@ -156,15 +169,18 @@ public class SchedulingService {
 
     /**
      * Registers a new non-admin user with the given credentials.
-     * The username must be unique (case-insensitive) and neither field may be blank.
+     * The username must be unique (case-insensitive) and neither field may be
+     * blank.
      *
      * @param username the desired username
      * @param password the desired password
-     * @return {@code true} if the user was created successfully; {@code false} if validation fails
+     * @return {@code true} if the user was created successfully; {@code false} if
+     *         validation fails
      *         or the username already exists
      */
     public boolean registerUser(String username, String password, String email) {
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()
+                || email == null || email.trim().isEmpty()) {
             return false;
         }
         for (User u : users) {
@@ -191,13 +207,15 @@ public class SchedulingService {
         Path path = Paths.get(filename);
         List<String> lines = new ArrayList<>();
         for (User user : users) {
-            lines.add(String.join("|", user.getUsername(), user.getPassword(), user.getEmail(), String.valueOf(user.isAdmin())));
+            lines.add(String.join("|", user.getUsername(), user.getPassword(), user.getEmail(),
+                    String.valueOf(user.isAdmin())));
         }
         Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     /**
-     * Loads users from a pipe-delimited text file, merging with the default admin and user accounts.
+     * Loads users from a pipe-delimited text file, merging with the default admin
+     * and user accounts.
      * Lines that are malformed (not exactly 3 fields) are silently skipped.
      *
      * @param filename the path of the file to read
@@ -210,8 +228,8 @@ public class SchedulingService {
         }
 
         Map<String, User> userMap = new LinkedHashMap<>();
-        userMap.put("admin", new User("admin", "admin123", "admin@system.com", true));
-        userMap.put("user", new User("user", "user123", "user@system.com", false));
+        userMap.put(ADMIN_USERNAME, new User(ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, true));
+        userMap.put(USER_USERNAME, new User(USER_USERNAME, USER_PASSWORD, USER_EMAIL, false));
 
         List<String> lines = Files.readAllLines(path);
         for (String line : lines) {
@@ -237,13 +255,15 @@ public class SchedulingService {
         Path path = Paths.get(filename);
         List<String> lines = new ArrayList<>();
         for (TimeSlot slot : slots) {
-            lines.add(String.join("|", slot.getStart().format(FILE_FORMATTER), slot.getEnd().format(FILE_FORMATTER), String.valueOf(slot.isAvailable())));
+            lines.add(String.join("|", slot.getStart().format(FILE_FORMATTER), slot.getEnd().format(FILE_FORMATTER),
+                    String.valueOf(slot.isAvailable())));
         }
         Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     /**
-     * Loads time slots from a pipe-delimited text file, replacing any slots currently in memory.
+     * Loads time slots from a pipe-delimited text file, replacing any slots
+     * currently in memory.
      * Lines that are malformed (not exactly 3 fields) are silently skipped.
      *
      * @param filename the path of the file to read
@@ -267,8 +287,7 @@ public class SchedulingService {
             }
             TimeSlot slot = new TimeSlot(
                     LocalDateTime.parse(parts[0], FILE_FORMATTER),
-                    LocalDateTime.parse(parts[1], FILE_FORMATTER)
-            );
+                    LocalDateTime.parse(parts[1], FILE_FORMATTER));
             slot.setAvailable(Boolean.parseBoolean(parts[2]));
             slots.add(slot);
         }
@@ -276,10 +295,12 @@ public class SchedulingService {
 
     /**
      * Adds a new time slot to the schedule if it is valid and not a duplicate.
-     * A valid slot must have a non-null start and end, and the start must be before the end.
+     * A valid slot must have a non-null start and end, and the start must be before
+     * the end.
      *
      * @param timeSlot the slot to add
-     * @return {@code true} if the slot was added; {@code false} if it is invalid or already exists
+     * @return {@code true} if the slot was added; {@code false} if it is invalid or
+     *         already exists
      */
     public boolean addTimeSlot(TimeSlot timeSlot) {
         if (timeSlot == null || timeSlot.getStart() == null || timeSlot.getEnd() == null) {
@@ -308,18 +329,21 @@ public class SchedulingService {
      * @return a list of available {@link TimeSlot} objects; never {@code null}
      */
     public List<TimeSlot> getAvailableSlots() {
-        return slots.stream().filter(TimeSlot::isAvailable).collect(Collectors.toList());
+        return slots.stream().filter(TimeSlot::isAvailable).toList();
     }
 
     /**
      * Books the given time slot for the currently logged-in user.
-     * All registered booking rules are validated before the appointment is confirmed.
-     * Requires an authenticated user; returns {@code false} if no user is logged in.
+     * All registered booking rules are validated before the appointment is
+     * confirmed.
+     * Requires an authenticated user; returns {@code false} if no user is logged
+     * in.
      *
      * @param slot         the time slot to book
      * @param participants the number of participants for the appointment
      * @param type         the type of appointment
-     * @return {@code true} if the appointment was booked successfully; {@code false} if
+     * @return {@code true} if the appointment was booked successfully;
+     *         {@code false} if
      *         no user is logged in or any booking rule is violated
      */
     public boolean book(TimeSlot slot, int participants, AppointmentType type) {
@@ -331,7 +355,8 @@ public class SchedulingService {
                 slot.getStart(), slot.getEnd(), participants, type);
 
         for (BookingRuleStrategy rule : rules) {
-            if (!rule.isValid(appt)) return false;
+            if (!rule.isValid(appt))
+                return false;
         }
         appointments.add(appt);
         slot.setAvailable(false);
@@ -344,16 +369,21 @@ public class SchedulingService {
      * Administrators may cancel any appointment regardless of owner or time.
      *
      * @param id the unique identifier of the appointment to cancel
-     * @return {@code true} if the appointment was cancelled; {@code false} if it does not exist,
-     *         the current user lacks permission, or the appointment is already in the past
+     * @return {@code true} if the appointment was cancelled; {@code false} if it
+     *         does not exist,
+     *         the current user lacks permission, or the appointment is already in
+     *         the past
      */
     public boolean cancel(String id) {
         Optional<Appointment> opt = appointments.stream().filter(a -> a.getId().equals(id)).findFirst();
-        if (!opt.isPresent()) return false;
+        if (!opt.isPresent())
+            return false;
 
         Appointment a = opt.get();
-        if (!currentUser.isAdmin() && !a.getUserId().equals(currentUser.getUsername())) return false;
-        if (!currentUser.isAdmin() && a.getStart().isBefore(LocalDateTime.now())) return false;
+        if (!currentUser.isAdmin() && !a.getUserId().equals(currentUser.getUsername()))
+            return false;
+        if (!currentUser.isAdmin() && a.getStart().isBefore(LocalDateTime.now()))
+            return false;
 
         a.setStatus("Cancelled");
         slots.stream().filter(s -> s.getStart().equals(a.getStart()) && s.getEnd().equals(a.getEnd()))
@@ -368,10 +398,11 @@ public class SchedulingService {
      * @return a list of {@link Appointment} objects; never {@code null}
      */
     public List<Appointment> getAppointments() {
-        if (currentUser != null && currentUser.isAdmin()) return appointments;
+        if (currentUser != null && currentUser.isAdmin())
+            return appointments;
         return appointments.stream()
                 .filter(a -> a.getUserId().equals(currentUser.getUsername()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -380,7 +411,7 @@ public class SchedulingService {
      * @return a list of admin {@link User} objects; never {@code null}
      */
     public List<User> getAdminUsers() {
-        return users.stream().filter(User::isAdmin).collect(Collectors.toList());
+        return users.stream().filter(User::isAdmin).toList();
     }
 
     /**
@@ -394,8 +425,10 @@ public class SchedulingService {
     }
 
     /**
-     * Sends a reminder for a single appointment to the given user and all administrators,
-     * provided the appointment is not cancelled, the reminder has not already been sent,
+     * Sends a reminder for a single appointment to the given user and all
+     * administrators,
+     * provided the appointment is not cancelled, the reminder has not already been
+     * sent,
      * and the appointment starts within the next hour.
      *
      * @param appointment the appointment to check; must not be {@code null}
@@ -418,13 +451,15 @@ public class SchedulingService {
     }
 
     /**
-     * Iterates over all appointments and sends reminders for any that are due within the next hour,
+     * Iterates over all appointments and sends reminders for any that are due
+     * within the next hour,
      * have not yet been reminded, and are not cancelled.
      */
     public void checkAndSendRemindersForDueAppointments() {
         LocalDateTime now = LocalDateTime.now();
         for (Appointment appointment : appointments) {
-            if (appointment == null || appointment.isReminderSent() || "Cancelled".equalsIgnoreCase(appointment.getStatus())) {
+            if (appointment == null || appointment.isReminderSent()
+                    || "Cancelled".equalsIgnoreCase(appointment.getStatus())) {
                 continue;
             }
             if (!appointment.getStart().isBefore(now.plusHours(1)) || appointment.getStart().isBefore(now)) {
@@ -451,7 +486,8 @@ public class SchedulingService {
     }
 
     /**
-     * Loads appointments from a pipe-delimited text file, replacing all appointments currently
+     * Loads appointments from a pipe-delimited text file, replacing all
+     * appointments currently
      * in memory and resetting slot availability accordingly.
      *
      * @param filename the path of the file to read
@@ -459,14 +495,16 @@ public class SchedulingService {
      */
     public void loadAppointments(String filename) throws IOException {
         Path path = Paths.get(filename);
-        if (!Files.exists(path)) return;
+        if (!Files.exists(path))
+            return;
 
         appointments.clear();
         slots.forEach(slot -> slot.setAvailable(true));
 
         List<String> lines = Files.readAllLines(path);
         for (String line : lines) {
-            if (line.trim().isEmpty()) continue;
+            if (line.trim().isEmpty())
+                continue;
             Appointment appointment = Appointment.fromFileString(line);
             appointments.add(appointment);
             updateSlotAvailability(appointment);
@@ -481,7 +519,8 @@ public class SchedulingService {
      */
     private void updateSlotAvailability(Appointment appointment) {
         Optional<TimeSlot> existing = slots.stream()
-                .filter(slot -> slot.getStart().equals(appointment.getStart()) && slot.getEnd().equals(appointment.getEnd()))
+                .filter(slot -> slot.getStart().equals(appointment.getStart())
+                        && slot.getEnd().equals(appointment.getEnd()))
                 .findFirst();
 
         if (existing.isPresent()) {
@@ -497,10 +536,11 @@ public class SchedulingService {
     }
 
     /**
-     * Clears all time slots from memory. Used only in tests to ensure a clean state.
+     * Clears all time slots from memory. Used only in tests to ensure a clean
+     * state.
      */
     void clearSlotsForTesting() {
-    slots.clear();
-}
+        slots.clear();
+    }
 
 }

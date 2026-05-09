@@ -1,11 +1,13 @@
 package com.project.observer;
 
 import com.project.User;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class SystemNotification implements Observer {
+    private static final Logger logger = Logger.getLogger(SystemNotification.class.getName());
     private static final String NOTIFICATION_TITLE = "Appointment Scheduler";
     private static TrayIcon trayIcon;
 
@@ -14,7 +16,7 @@ public class SystemNotification implements Observer {
         String fullMessage = "Hello " + user.getUsername() + "!\n" + message;
 
         if (!SystemTray.isSupported()) {
-            System.out.println("[OS Notification - not supported, fallback] " + fullMessage);
+            logger.warning("[OS Notification - not supported, fallback] " + fullMessage);
             return;
         }
 
@@ -22,7 +24,7 @@ public class SystemNotification implements Observer {
             TrayIcon icon = getTrayIcon();
             icon.displayMessage(NOTIFICATION_TITLE, fullMessage, TrayIcon.MessageType.INFO);
         } catch (Throwable e) {
-            System.out.println("[OS Notification - error, fallback] " + fullMessage);
+            logger.log(Level.SEVERE, "[OS Notification - error, fallback] " + fullMessage, e);
         }
     }
 
