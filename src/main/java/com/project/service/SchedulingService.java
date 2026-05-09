@@ -42,14 +42,6 @@ public class SchedulingService {
     /** Default filename for persisting available time slots. */
     private static final String SLOT_FILE = "slots.txt";
 
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_PASSWORD = "admin123";
-    private static final String ADMIN_EMAIL = "admin@system.com";
-
-    private static final String USER_USERNAME = "user";
-    private static final String USER_PASSWORD = "user123";
-    private static final String USER_EMAIL = "user@system.com";
-
     /** In-memory list of all registered users. */
     private List<User> users = new ArrayList<>();
 
@@ -99,8 +91,6 @@ public class SchedulingService {
             notificationService = new NotificationService(new NotificationManager());
         }
 
-        users.add(new User(ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, true));
-        users.add(new User(USER_USERNAME, USER_PASSWORD, USER_EMAIL, false));
         try {
             loadUsers(USER_FILE);
         } catch (IOException e) {
@@ -228,8 +218,6 @@ public class SchedulingService {
         }
 
         Map<String, User> userMap = new LinkedHashMap<>();
-        userMap.put(ADMIN_USERNAME, new User(ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, true));
-        userMap.put(USER_USERNAME, new User(USER_USERNAME, USER_PASSWORD, USER_EMAIL, false));
 
         List<String> lines = Files.readAllLines(path);
         for (String line : lines) {
